@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!SEQUEIRA CLARA, NICOLE MORENO, ERIKA JOHNSON, ACEVEDO VALENTINA html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
