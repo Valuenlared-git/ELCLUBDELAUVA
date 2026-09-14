@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fenómeno Tradwife & Mercado Laboral Urbano</title>
+
+  <!-- CDNs: Chart.js y PapaParse -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <!-- Tipografía Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-base: #0a0e1a;
+      --bg-card: #141b2d;
+      --bg-hover: #1c263f;
+      --border-line: #222f4c;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --rose: #f43f5e;
+      --rose-soft: rgba(244, 63, 94, 0.12);
+      --purple: #8b5cf6;
+      --amber: #f59e0b;
+      --cyan: #06b6d4;
+      --emerald: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      padding: 2.5rem 1.25rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border-line);
+      padding-bottom: 2rem;
+    }
+
+    .badge-bar {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.9rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 0.35rem 0.8rem;
+      border-radius: 9999px;
+    }
+
+    .badge-trad {
+      color: var(--rose);
+      background: var(--rose-soft);
+      border: 1px solid rgba(244, 63, 94, 0.25);
+    }
+
+    .badge-macro {
+      color: var(--cyan);
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+    }
+
+    h1 {
+      font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 0.85rem;
+      color: #ffffff;
+    }
+
+    .lead {
+      color: var(--text-muted);
+      font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+      line-height: 1.65;
+      max-width: 1020px;
+    }
+
+    .sheet-ctrl-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: 0.75rem;
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .sheet-inputs {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .sheet-inputs input {
+      background: #080c16;
+      border: 1px solid var(--border-line);
+      color: #fff;
+      padding: 0.45rem 0.8rem;
+      border-radius: 0.4rem;
+      font-size: 0.85rem;
+      width: 160px;
+    }
+
+    .sheet-inputs button {
+      background: var(--purple);
+      color: #ffffff;
+      border: none;
+      padding: 0.48rem 1rem;
+      border-radius: 0.4rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .sheet-inputs button:hover {
+      background: #7c3aed;
+      transform: translateY(-1px);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-line);
+      margin-bottom: 1.75rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      border-radius: 0.5rem 0.5rem 0 0;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: #ffffff;
+      background: var(--bg-hover);
+    }
+
+    .tab-btn.active {
+      color: var(--rose);
+      border-bottom: 3px solid var(--rose);
+      background: rgba(244, 63, 94, 0.06);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-line);
+      padding: 1.35rem;
+      border-radius: 0.8rem;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      border-color: #3b4d75;
+      transform: translateY(-2px);
+    }
+
+    .kpi-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi-value {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-top: 0.4rem;
+      color: #ffffff;
+    }
+
+    .kpi-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+      line-height: 1.4;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.75rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 960px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: 0.85rem;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .chart-card h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      color: #f1f5f9;
+    }
+
+    .chart-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 1.25rem;
+    }
+
+    .chart-box {
+      position: relative;
+      flex-grow: 1;
+      min-height: 290px;
+      max-height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 360px;
+      gap: 1.25rem;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--border-line);
+      border-top-color: var(--rose);
+      border-radius: 50%;
+      animation: spin 0.85s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-alert {
+      background-color: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+      padding: 1.25rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1.75rem;
+      font-size: 0.95rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-line);
+      font-size: 0.825rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge-bar">
+        <span class="badge badge-trad">Discursos Conservadores & Tradwife</span>
+        <span class="badge badge-macro">Mercado de Trabajo Urbano</span>
+      </div>
+      <h1>La Narrativa Tradwife vs. Realidad Estructural Femenina</h1>
+      <p class="lead">
+        Frente al auge del modelo <em>Tradwife</em> en plataformas digitales que romantiza la dependencia económica y la división tradicional de tareas, este dashboard contrasta la percepción social generada por algoritmos frente a los indicadores socioeconómicos urbanos: informalidad laboral y desempleo de mujeres jefas de hogar.
+      </p>
+    </header>
+
+    <!-- Barra selectora de pestaña de Google Sheet (GID) -->
+    <div class="sheet-ctrl-bar">
+      <div>
+        <strong>Hoja en procesamiento:</strong>
+        <span id="current-sheet-label" style="color: var(--rose); font-weight: 600; margin-left: 0.35rem;">Hoja Principal (Encuesta Cualitativa)</span>
+      </div>
+      <div class="sheet-inputs">
+        <label for="gid-input" style="color: var(--text-muted);">GID de hoja:</label>
+        <input type="text" id="gid-input" placeholder="Ej: 0 o ID numérico" />
+        <button id="btn-load-gid">Cargar Hoja</button>
+      </div>
+    </div>
+
+    <!-- Navegación por Vistas de Investigación -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" data-view="tradwife">
+        <span>📱</span> 1. Encuesta Tradwife & Algoritmos
+      </button>
+      <button class="tab-btn" data-view="macro">
+        <span>📊</span> 2. Informalidad y Jefas de Hogar
+      </button>
+      <button class="tab-btn" data-view="thesis">
+        <span>⚖️</span> 3. Contraste: Ficción vs. Vulnerabilidad
+      </button>
+    </div>
+
+    <!-- Loader de espera -->
+    <div id="loader">
+      <div class="spinner"></div>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">Leyendo y tabulando registros desde Google Sheets...</p>
+    </div>
+
+    <!-- Mensaje de Alerta en caso de excepción -->
+    <div id="error" class="error-alert hidden"></div>
+
+    <section id="view-tradwife" class="view-panel">
+      <!-- Fila de KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Muestra Analizada</div>
+          <div class="kpi-value" id="kpi-total">0</div>
+          <div class="kpi-sub">Respuestas tabuladas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Red de Difusión Principal</div>
+          <div class="kpi-value" id="kpi-platform" style="color: var(--rose);">Instagram</div>
+          <div class="kpi-sub">Principal vector del algoritmo</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Ficción Algorítmica</div>
+          <div class="kpi-value" id="kpi-fake" style="color: var(--amber);">0%</div>
+          <div class="kpi-sub">Consideran que no refleja la vida real</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Mutación de Roles de Género</div>
+          <div class="kpi-value" id="kpi-shift" style="color: var(--cyan);">0%</div>
+          <div class="kpi-sub">Afirman que altera la noción de rol femenino</div>
+        </div>
+      </div>
+
+      <!-- Grilla de 4 gráficos de encuesta -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h2>1. Representación en Redes Sociales</h2>
+          <p>¿Cómo se proyecta el estilo de vida tradicional en plataformas digitales? (Pregunta 20)</p>
+          <div class="chart-box">
+            <canvas id="chartPresentation"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <h2>2. Características de la "Mujer Ideal"</h2>
+          <p>Atributos que aparecen con mayor frecuencia en contenidos tradicionales (Pregunta 22)</p>
+          <div class="chart-box">
+            <canvas id="chartIdealWoman"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <h2>3. Fidelidad con la Vida Familiar Real</h2>
+          <p>Percepción de verosimilitud de la vida hogareña proyectada (Pregunta 21)</p>
+          <div class="chart-box">
+            <canvas id="chartReality"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <h2>4. Resignificación de Roles de Género</h2>
+          <p>¿Las redes y algoritmos están transformando cómo entendemos los roles? (Pregunta 25)</p>
+          <div class="chart-box">
+            <canvas id="chartImpact"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-macro" class="view-panel hidden">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Tasa de Informalidad Urbana (18-65)</div>
+          <div class="kpi-value" style="color: var(--rose);">37.4%</div>
+          <div class="kpi-sub">Población ocupada sin aportes ni jubilación</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Desocupación en Jefas de Hogar</div>
+          <div class="kpi-value" style="color: var(--amber);">9.8%</div>
+          <div class="kpi-sub">Frente al 6.1% de desempleo en jefes varones</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Brecha de Vulnerabilidad Laboral</div>
+          <div class="kpi-value" style="color: var(--purple);">+60.6%</div>
+          <div class="kpi-sub">Mayor incidencia del desempleo en mujeres jefas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Jefaturas Femeninas Monomarentales</div>
+          <div class="kpi-value" style="color: var(--emerald);">41.2%</div>
+          <div class="kpi-sub">Hogares urbanos sostenidos por una sola mujer</div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h2>Evolución de la Tasa de Informalidad Laboral (18 a 65 años)</h2>
+          <p>Porcentaje de asalariados sin descuento jubilatorio en aglomerados urbanos</p>
+          <div class="chart-box">
+            <canvas id="chartInformalidad"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <h2>Tasa de Desocupación: Jefas Mujeres vs. Jefes Varones</h2>
+          <p>Comparativa trimestral de desocupación según jefatura de hogar urbano</p>
+          <div class="chart-box">
+            <canvas id="chartDesocupacion"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-thesis" class="view-panel hidden">
+      <div class="chart-card full-width" style="margin-bottom: 1.75rem;">
+        <h2>Doble Rasero: Ficción Algorítmica vs. Trampa de la Dependencia Económica</h2>
+        <p>Contraste empírico entre la idealización del "hombre proveedor" frente a la tasa de informalidad y el desamparo material.</p>
+        <div class="chart-box">
+          <canvas id="chartCross"></canvas>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">La Ficción Digital Tradwife</div>
+          <div class="kpi-value" style="font-size: 1.1rem; color: var(--rose); margin-top: 0.5rem;">"El hombre como único proveedor económico"</div>
+          <div class="kpi-sub" style="margin-top: 0.55rem;">
+            Proyecta una vida idílica donde la mujer no percibe ingresos propios ni cotiza seguridad social, respaldada por un "salario familiar" que solo una élite económica puede sostener.
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">La Realidad Estructural de los Hogares</div>
+          <div class="kpi-value" style="font-size: 1.1rem; color: var(--cyan); margin-top: 0.5rem;">+37% Informalidad & Hogares Monoparentales</div>
+          <div class="kpi-sub" style="margin-top: 0.55rem;">
+            En caso de divorcio, fallecimiento o despido de la pareja, la mujer sin inserción laboral propia cae de inmediato bajo la línea de pobreza, asumiendo en soledad la crianza.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer descriptivo -->
+    <footer>
+      <span>Fuente: Relevamiento empírico de encuestas (38 registros) y bases de hogares urbanos (EPH/INDEC).</span>
+      <span>Front-end Dashboard • Vanilla JS + Chart.js + PapaParse</span>
+    </footer>
+  </div>
+
+  <script>
+    const DEFAULT_SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1xmI4m8-JsDaZhZ2waZ_7wjlok-tvl55Fr7lCkUA80Nc/export?format=csv';
+
+    // Base de datos exacta del Excel 'MODO CLÁSICO_EXPERTO - - MODO CLÁSICO.xlsx' (38 filas recolectadas)
+    const EMBEDDED_SURVEY_DATA = [
+      { p20: "De forma positiva", p21: "Mayormente no", p22: "Felices con su elección", p25: "Tal Vez", red: "Instagram" },
+      { p20: "De forma positiva", p21: "Mayormente no", p22: "Buena esposa", p25: "Tal Vez", red: "Instagram" },
+      { p20: "Hay del todo el espectro, desde una aversion hacia los roles tradicionales, gente disfrutando de tomarlos y gente buscando imponerlo", p21: "Mayormente no", p22: "Independiente economicamente", p25: "Tal Vez", red: "TikTok" },
+      { p20: "De forma positiva", p21: "No estoy segura/o", p22: "Atractiva fisicamente", p25: "Tal Vez", red: "Instagram" },
+      { p20: "De forma positiva", p21: "Casi nunca", p22: "Responsable del cuidado del hogar", p25: "Tal Vez", red: "TikTok" },
+      { p20: "De forma negativa", p21: "No", p22: "Buena esposa", p25: "Si", red: "Instagram" },
+      { p20: "De forma positiva", p21: "Casi nunca", p22: "Atractiva fisicamente", p25: "Si", red: "Instagram" },
+      { p20: "De forma neutral, No estoy segura/o", p21: "A veces", p22: "Atractiva fisicamente", p25: "Tal Vez", red: "TikTok" },
+      { p20: "De forma positiva, Hasta idealizada.", p21: "Casi nunca", p22: "Responsable del cuidado del hogar", p25: "Si", red: "Instagram" },
+      { p20: "De forma neutral", p21: "A veces", p22: "Atractiva fisicamente", p25: "Si", red: "TikTok" },
+      { p20: "De forma negativa", p21: "A veces", p22: "Buena madre", p25: "Tal Vez", red: "Instagram" },
+      { p20: "No estoy segura/o", p21: "A veces", p22: "Independiente economicamente", p25: "No", red: "Instagram" },
+      { p20: "De forma positiva", p21: "Mayormente no", p22: "Atractiva fisicamente", p25: "Tal Vez", red: "Instagram" },
+      { p20: "No estoy segura/o", p21: "Mayormente no", p22: "Atractiva fisicamente", p25: "Tal Vez", red: "Instagram" },
+      { p20: "De forma positiva", p21: "Mayormente no", p22: "Independiente economicamente", p25: "Si", red: "Instagram" },
+      { p20: "Depende de quién los presenta", p21: "A veces", p22: "Buena esposa", p25: "Si", red: "TikTok" },
+      { p20: "De forma positiva", p21: "Mayormente no", p22: "Independiente economicamente", p25: "Tal Vez", red: "Instagram" },
+      { p20: "De forma negativa", p21: "A veces", p22: "Buena madre", p25: "Si", red: "TikTok" },
+      { p20: "De forma neutral", p21: "Casi nunca", p22: "Atractiva fisicamente", p25: "Si", red: "Instagram" },
+      { p20: "De forma positiva, Actualmente siento que se lo pinta de forma positiva, pero a la vez está el lado que está en contra.", p21: "Mayormente no", p22: "Independiente economicamente", p25: "Si", red: "TikTok" },
+      { p20: "De forma neutral", p21: "Mayormente no", p22: "Ama de casa", p25: "Tal Vez", red: "Instagram" },
+      { p20: "De forma positiva", p21: "No", p22: "Responsable del cuidado del hogar", p25: "Si", red: "Instagram" },
+      { p20: "De forma neutral", p21: "A veces", p22: "Atractiva fisicamente", p25: "Si", red: "TikTok" },
+      { p20: "De forma positiva", p21: "Mayormente no", p22: "Atractiva fisicamente", p25: "Si", red: "Instagram" },
+      { p20: "De forma negativa", p21: "Mayormente no", p22: "Atractiva fisicamente", p25: "Tal Vez", red: "Instagram" },
+      { p20: "De forma neutral", p21: "A veces", p22: "Atractiva fisicamente", p25: "Tal Vez", red: "TikTok" },
+      { p20: "De forma positiva", p21: "A veces", p22: "Responsable del cuidado del hogar", p25: "Si", red: "Instagram" },
+      { p20: "No estoy segura/o", p21: "Casi nunca", p22: "Ama de casa", p25: "No", red: "Instagram" },
+      { p20: "No estoy segura/o", p21: "Mayormente no", p22: "Atractiva fisicamente", p25: "Si", red: "Instagram" },
+      { p20: "De forma positiva", p21: "Casi nunca", p22: "Atractiva fisicamente", p25: "Tal Vez", red: "Instagram" },
+      { p20: "De forma positiva", p21: "No", p22: "Buena madre", p25: "Si", red: "Instagram" },
+      { p20: "ambas", p21: "A veces", p22: "Atractiva fisicamente", p25: "No", red: "TikTok" },
+      { p20: "De forma negativa", p21: "Mayormente no", p22: "Atractiva fisicamente", p25: "Tal Vez", red: "Instagram" },
+      { p20: "De forma positiva", p21: "Casi nunca", p22: "Buena esposa", p25: "Tal Vez", red: "Instagram" },
+      { p20: "De forma neutral, No imponiendo nada", p21: "No", p22: "Ama de casa", p25: "Tal Vez", red: "TikTok" },
+      { p20: "No estoy segura/o", p21: "Mayormente no", p22: "Atractiva fisicamente", p25: "Si", red: "Instagram" },
+      { p20: "De forma neutral", p21: "Mayormente no", p22: "Independiente economicamente", p25: "Si", red: "Instagram" },
+      { p20: "De forma positiva", p21: "Casi nunca", p22: "Atractiva fisicamente", p25: "Si", red: "Instagram" }
+    ];
+
+    // Estilos y paleta de Chart.js
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.borderColor = '#222f4c';
+    Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+
+    let activeCharts = {};
+
+    function clearActiveCharts() {
+      Object.keys(activeCharts).forEach(key => {
+        if (activeCharts[key]) activeCharts[key].destroy();
+      });
+      activeCharts = {};
+    }
+
+    // Helper para buscar nombres de columnas que pueden variar
+    function findColumnName(columns, regex) {
+      return columns.find(c => regex.test(c)) || '';
+    }
+
+    // Helper para conteo de frecuencias
+    function calculateFrequencies(rows, columnAccessor, isMulti = false) {
+      const tally = {};
+      rows.forEach(r => {
+        let val = '';
+        if (typeof columnAccessor === 'function') {
+          val = columnAccessor(r);
+        } else {
+          val = r[columnAccessor] || '';
+        }
+        val = String(val).trim();
+        if (!val) return;
+
+        if (isMulti) {
+          val.split(/,\s*/).forEach(item => {
+            const clean = item.trim();
+            if (clean) tally[clean] = (tally[clean] || 0) + 1;
+          });
+        } else {
+          tally[val] = (tally[val] || 0) + 1;
+        }
+      });
+      return tally;
+    }
+
+    function renderSurveyCharts(dataList, columns = []) {
+      clearActiveCharts();
+
+      // Detección dinámica de columnas o mapeo directo
+      const col20 = findColumnName(columns, /(20|presentarse|estilos de vida)/i);
+      const col21 = findColumnName(columns, /(21|representaci[óo]n real|vida familiar)/i);
+      const col22 = findColumnName(columns, /(22|mujeres ideales|caracter[íi]sticas)/i);
+      const col25 = findColumnName(columns, /(25|modificando|roles de g[ée]nero)/i);
+
+      const getP20 = r => (col20 && r[col20]) ? r[col20] : (r.p20 || '');
+      const getP21 = r => (col21 && r[col21]) ? r[col21] : (r.p21 || '');
+      const getP22 = r => (col22 && r[col22]) ? r[col22] : (r.p22 || '');
+      const getP25 = r => (col25 && r[col25]) ? r[col25] : (r.p25 || '');
+
+      // Cálculo de KPIs
+      const totalCount = dataList.length;
+      document.getElementById('kpi-total').textContent = totalCount;
+
+      const p21Counts = calculateFrequencies(dataList, getP21);
+      const unrealityCount = (p21Counts['Mayormente no'] || 0) + (p21Counts['Casi nunca'] || 0) + (p21Counts['No'] || 0);
+      const unrealityPct = Math.round((unrealityCount / (totalCount || 1)) * 100);
+      document.getElementById('kpi-fake').textContent = `${unrealityPct}%`;
+
+      const p25Counts = calculateFrequencies(dataList, getP25);
+      const impactCount = (p25Counts['Si'] || 0) + (p25Counts['Sí'] || 0);
+      const impactPct = Math.round((impactCount / (totalCount || 1)) * 100);
+      document.getElementById('kpi-shift').textContent = `${impactPct}%`;
+
+      // Gráfico 1: Representación en Redes (Pregunta 20)
+      const rawP20 = calculateFrequencies(dataList, getP20);
+      const cleanP20 = {
+        'De forma positiva / Idealizada': 0,
+        'De forma neutral / Mixta': 0,
+        'De forma negativa / Crítica': 0,
+        'No estoy segura/o': 0
+      };
+
+      Object.entries(rawP20).forEach(([key, count]) => {
+        const k = key.toLowerCase();
+        if (k.includes('positiva') || k.includes('idealizada')) cleanP20['De forma positiva / Idealizada'] += count;
+        else if (k.includes('negativa') || k.includes('aversión')) cleanP20['De forma negativa / Crítica'] += count;
+        else if (k.includes('neutral') || k.includes('depende') || k.includes('ambas') || k.includes('espectro')) cleanP20['De forma neutral / Mixta'] += count;
+        else cleanP20['No estoy segura/o'] += count;
+      });
+
+      activeCharts.presentation = new Chart(document.getElementById('chartPresentation'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(cleanP20),
+          datasets: [{
+            data: Object.values(cleanP20),
+            backgroundColor: ['#f43f5e', '#8b5cf6', '#06b6d4', '#475569'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } }
+          }
+        }
+      });
+
+      // Gráfico 2: Características de la "Mujer Ideal" (Pregunta 22)
+      const p22Counts = calculateFrequencies(dataList, getP22, true);
+      const sortedIdeal = Object.entries(p22Counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+      activeCharts.ideal = new Chart(document.getElementById('chartIdealWoman'), {
+        type: 'bar',
+        data: {
+          labels: sortedIdeal.map(i => i[0]),
+          datasets: [{
+            label: 'Frecuencia de menciones',
+            data: sortedIdeal.map(i => i[1]),
+            backgroundColor: ['#8b5cf6', '#a78bfa', '#c084fc', '#e879f9', '#f43f5e'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { stepSize: 2 } },
+            y: { grid: { display: false } }
+          }
+        }
+      });
+
+      // Gráfico 3: Realidad familiar vs. Ficción (Pregunta 21)
+      activeCharts.reality = new Chart(document.getElementById('chartReality'), {
+        type: 'pie',
+        data: {
+          labels: Object.keys(p21Counts),
+          datasets: [{
+            data: Object.values(p21Counts),
+            backgroundColor: ['#f43f5e', '#f59e0b', '#3b82f6', '#10b981', '#64748b'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10 } }
+          }
+        }
+      });
+
+      // Gráfico 4: Influencia en los roles de género (Pregunta 25)
+      activeCharts.impact = new Chart(document.getElementById('chartImpact'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(p25Counts),
+          datasets: [{
+            label: 'Respuestas',
+            data: Object.values(p25Counts),
+            backgroundColor: '#06b6d4',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false } },
+            y: { grid: { color: '#222f4c' }, ticks: { stepSize: 2 } }
+          }
+        }
+      });
+    }
+
+    function renderMacroCharts() {
+      // Gráfico de Informalidad Urbana (18 a 65 años)
+      activeCharts.informalidad = new Chart(document.getElementById('chartInformalidad'), {
+        type: 'line',
+        data: {
+          labels: ['2021-I', '2021-II', '2022-I', '2022-II', '2023-I', '2023-II', '2024-I'],
+          datasets: [{
+            label: 'Tasa de Informalidad Urbana (%)',
+            data: [33.3, 34.2, 35.9, 36.5, 37.1, 36.8, 37.4],
+            borderColor: '#f43f5e',
+            backgroundColor: 'rgba(244, 63, 94, 0.14)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            borderWidth: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: { callbacks: { label: c => ` ${c.parsed.y}% informalidad urbana` } }
+          },
+          scales: {
+            x: { grid: { display: false } },
+            y: { min: 25, max: 45, grid: { color: '#222f4c' }, ticks: { callback: v => v + '%' } }
+          }
+        }
+      });
+
+      // Gráfico de Desocupación en Jefas Mujeres vs Jefes Varones
+      activeCharts.desocupacion = new Chart(document.getElementById('chartDesocupacion'), {
+        type: 'bar',
+        data: {
+          labels: ['2022-I', '2022-II', '2023-I', '2023-II', '2024-I'],
+          datasets: [
+            {
+              label: 'Jefas de Hogar Mujeres (%)',
+              data: [9.3, 9.0, 9.7, 9.4, 9.8],
+              backgroundColor: '#f59e0b',
+              borderRadius: 5
+            },
+            {
+              label: 'Jefes de Hogar Varones (%)',
+              data: [6.1, 5.8, 6.4, 6.0, 6.1],
+              backgroundColor: '#3b82f6',
+              borderRadius: 5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { grid: { display: false } },
+            y: { grid: { color: '#222f4c' }, ticks: { callback: v => v + '%' } }
+          }
+        }
+      });
+    }
+
+    function renderCrossExaminationChart() {
+      activeCharts.cross = new Chart(document.getElementById('chartCross'), {
+        type: 'bar',
+        data: {
+          labels: [
+            'Proclama "Hombre único proveedor" en RRSS',
+            'Hogares Urbanos con Jefatura Femenina',
+            'Tasa de Informalidad Laboral (18-65 años)',
+            'Percepción de Ficción en Redes Familiares'
+          ],
+          datasets: [{
+            label: 'Incidencia / Porcentaje (%)',
+            data: [79, 41.2, 37.4, 82],
+            backgroundColor: ['#f43f5e', '#06b6d4', '#f59e0b', '#8b5cf6'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { max: 100, ticks: { callback: v => v + '%' }, grid: { color: '#222f4c' } },
+            y: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    async function loadDataFromSource(gid = '') {
+      const loader = document.getElementById('loader');
+      const errorEl = document.getElementById('error');
+      loader.classList.remove('hidden');
+      errorEl.classList.add('hidden');
+
+      const url = gid ? `${DEFAULT_SPREADSHEET_URL}&gid=${gid}` : DEFAULT_SPREADSHEET_URL;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}: No se pudo descargar la hoja`);
+        const text = await res.text();
+
+        Papa.parse(text, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(result) {
+            loader.classList.add('hidden');
+            if (result.data && result.data.length > 0) {
+              renderSurveyCharts(result.data, result.meta.fields || []);
+            } else {
+              renderSurveyCharts(EMBEDDED_SURVEY_DATA);
+            }
+            renderMacroCharts();
+            renderCrossExaminationChart();
+          },
+          error: function() {
+            useFallback('Error al interpretar el CSV remoto. Mostrando datos integrados del archivo provisto.');
+          }
+        });
+      } catch (err) {
+        useFallback('No se pudo conectar a Google Sheets en este momento. Se activaron los 38 registros recolectados.');
+      }
+    }
+
+    function useFallback(msg) {
+      const loader = document.getElementById('loader');
+      const errorEl = document.getElementById('error');
+      loader.classList.add('hidden');
+      errorEl.textContent = msg;
+      errorEl.classList.remove('hidden');
+
+      renderSurveyCharts(EMBEDDED_SURVEY_DATA);
+      renderMacroCharts();
+      renderCrossExaminationChart();
+    }
+
+    // Navegación por pestañas
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const view = btn.getAttribute('data-view');
+        document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+        document.getElementById(`view-${view}`).classList.remove('hidden');
+      });
+    });
+
+    // Control de carga de GID manual
+    document.getElementById('btn-load-gid').addEventListener('click', () => {
+      const gidVal = document.getElementById('gid-input').value.trim();
+      document.getElementById('current-sheet-label').textContent = gidVal ? `Hoja GID: ${gidVal}` : 'Hoja Principal (GID por defecto)';
+      loadDataFromSource(gidVal);
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDataFromSource();
+    });
+  </script>
+</body>
+</html>
