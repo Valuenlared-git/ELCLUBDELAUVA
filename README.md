@@ -1,4 +1,3 @@
-nojekyll 
  <title>Tradwife y Tik tok</title>
     <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
