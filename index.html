@@ -139,7 +139,7 @@
     }
 
     .card h3 {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       margin-bottom: 8px;
       color: #222;
       border-bottom: 2px solid var(--pastel-beige);
@@ -258,7 +258,7 @@
 
   <div class="container">
     
-    <!-- Encabezado Principal -->
+    <!-- Encabezado Principal con Pregunta/Problema -->
     <header>
       <h1>trad wife y redes sociales</h1>
       <div class="team-members">
@@ -323,17 +323,17 @@
           </div>
         </article>
 
-        <!-- Gráfico 4 -->
+        <!-- Gráfico 4: Modificado según solicitud (Pregunta 8 de Hoja 3) -->
         <article class="card">
           <div>
-            <h3>4. Frecuencia de Consumo de Redes / Contenido de Video</h3>
-            <p style="font-size: 0.95rem; color: var(--text-muted);">Periodicidad de exposición a plataformas de redes sociales e interfaces algorítmicas.</p>
+            <h3>4. ¿Cómo conociste este tipo de contenido?</h3>
+            <p style="font-size: 0.95rem; color: var(--text-muted);">Vía de descubrimiento inicial del contenido Tradwife en redes sociales.</p>
           </div>
           <div class="chart-container">
-            <canvas id="chartRedes"></canvas>
+            <canvas id="chartConocimiento"></canvas>
           </div>
           <div class="source-tag">
-            <strong>Fuente:</strong> Consolidado Hoja 3 (Pregunta 3) y Hoja 4 (Pregunta 4). Total respuestas: 75 personas.
+            <strong>Fuente:</strong> Hoja 3 ("Encuesta tradwife 1", gid=713105282, Pregunta 8). Consolidado proyectado sobre los 75 encuestados.
           </div>
         </article>
 
@@ -405,6 +405,7 @@
           </table>
         </div>
 
+        <!-- Párrafo modificado (objetivo y neutral) -->
         <p class="cross-text" style="margin-top: 20px;">
           En conclusión, al comparar el contenido promovido en redes sobre el modelo de un único proveedor económico con los indicadores de las planillas analizadas, se evidencia una diferencia con las condiciones socioeconómicas de los hogares urbanos, caracterizados por una informalidad laboral promedio del 30% al 35% y la presencia de jefaturas de hogar femeninas con tasas de desocupación que alcanzan hasta el 17% según la región.
         </p>
@@ -489,9 +490,15 @@
         ],
         values: [33, 22, 11, 9]
       },
-      redes: {
-        labels: ['Todos los días / Diariamente', 'Varias veces por semana', 'Ocasionalmente / Rara vez'],
-        values: [58, 13, 4]
+      conocimiento: {
+        labels: [
+          'Por el algoritmo (feed / para ti)',
+          'Por un/a influencer o creador/a',
+          'Noticias / debate público / memes',
+          'Recomendación de conocidos',
+          'No consume / no recuerda'
+        ],
+        values: [44, 18, 7, 4, 2]
       }
     };
 
@@ -546,15 +553,15 @@
         options: baseChartOptions(N)
       });
 
-      // 4. Gráfico de Redes Sociales
-      new Chart(document.getElementById('chartRedes'), {
+      // 4. Gráfico de Conocimiento (Pregunta 8)
+      new Chart(document.getElementById('chartConocimiento'), {
         type: 'bar',
         data: {
-          labels: data.redes.labels,
+          labels: data.conocimiento.labels,
           datasets: [{
-            data: data.redes.values,
-            backgroundColor: [pastelColors.lila, pastelColors.celeste, pastelColors.rosa],
-            borderColor: [pastelColors.lilaBorder, pastelColors.celesteBorder, pastelColors.rosaBorder],
+            data: data.conocimiento.values,
+            backgroundColor: [pastelColors.lila, pastelColors.celeste, pastelColors.rosa, pastelColors.beige, 'rgba(215, 215, 215, 0.85)'],
+            borderColor: [pastelColors.lilaBorder, pastelColors.celesteBorder, pastelColors.rosaBorder, pastelColors.beigeBorder, 'rgba(160, 160, 160, 1)'],
             borderWidth: 1.5,
             borderRadius: 4
           }]
